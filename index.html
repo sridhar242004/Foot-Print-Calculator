@@ -206,238 +206,232 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glassmorphism">
-                <div class="modal-header">
-                    <h5 class="modal-title gradient-text">Success</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="successMessage"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        <div class="modal fade" id="howToUseModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glassmorphism">
+                    <div class="modal-header">
+                        <h5 class="modal-title gradient-text">How to Use EcoTrack</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Welcome to EcoTrack! This advanced footprint calculator helps you track and reduce your carbon footprint.</p>
+                        <p>To get started, simply fill out the calculator form with your daily electricity, transport, and diet habits.</p>
+                        <p>Click the "Calculate Footprint" button to see your results and receive personalized suggestions to reduce your footprint.</p>
+                        <p>You can also set goals for yourself and track your progress on the dashboard.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        let chart;
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script>
+            
+            document.addEventListener("DOMContentLoaded", function() {
+                var howToUseModal = new bootstrap.Modal(document.getElementById('howToUseModal'));
+                howToUseModal.show();
+            });
 
-        function showCalculator() {
-            document.getElementById('calculatorForm').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'none';
-        }
+            let chart;
 
-        function showDashboard() {
-            document.getElementById('calculatorForm').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            loadUserData();
-        }
-
-        function loadUserData() {
-            const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
-
-            const ctx = document.getElementById('footprintChart').getContext('2d');
-            if (chart) {
-                chart.destroy();
+            function showCalculator() {
+                document.getElementById('calculatorForm').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
             }
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: user.footprints.map(fp => fp.date),
-                    datasets: [{
-                        label: 'Carbon Footprint (kg CO2 per day)',
-                        data: user.footprints.map(fp => fp.footprint),
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+
+            function showDashboard() {
+                document.getElementById('calculatorForm').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadUserData();
+            }
+
+            function loadUserData() {
+                const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
+
+                const ctx = document.getElementById('footprintChart').getContext('2d');
+                if (chart) {
+                    chart.destroy();
+                }
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: user.footprints.map(fp => fp.date),
+                        datasets: [{
+                            label: 'Carbon Footprint (kg CO2 per day)',
+                            data: user.footprints.map(fp => fp.footprint),
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
                         }
                     }
+                });
+
+                const footprintList = document.getElementById('footprintList');
+                footprintList.innerHTML = '';
+                user.footprints.slice(-5).reverse().forEach(fp => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                        <span>${fp.date}</span>
+                        <span class="badge bg-primary rounded-pill">${fp.footprint.toFixed(2)} kg CO2</span>
+                    `;
+                    footprintList.appendChild(listItem);
+                });
+
+                constachievementList = document.getElementById('achievementList');
+                achievementList.innerHTML = '';
+                for (const [key, value] of Object.entries(user.goals)) {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                        <span>${key.charAt(0).toUpperCase() + key.slice(1)} Goal</span>
+                        <span class="badge bg-success rounded-pill">${value}</span>
+                    `;
+                    achievementList.appendChild(listItem);
                 }
-            });
-
-            const footprintList = document.getElementById('footprintList');
-            footprintList.innerHTML = '';
-            user.footprints.slice(-5).reverse().forEach(fp => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                listItem.innerHTML = `
-                    <span>${fp.date}</span>
-                    <span class="badge bg-primary rounded-pill">${fp.footprint.toFixed(2)} kg CO2</span>
-                `;
-                footprintList.appendChild(listItem);
-            });
-
-            const achievementList = document.getElementById('achievementList');
-            achievementList.innerHTML = '';
-            for (const [key, value] of Object.entries(user.goals)) {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                listItem.innerHTML = `
-                    <span>${key.charAt(0).toUpperCase() + key.slice(1)} Goal</span>
-                    <span class="badge bg-success rounded-pill">${value}</span>
-                `;
-                achievementList.appendChild(listItem);
             }
-        }
 
-        function calculateFootprint() {
-            const electricity = parseFloat(document.getElementById('electricity').value) || 0;
-            const transport = parseFloat(document.getElementById('transport').value) || 0;
-            const diet = parseFloat(document.getElementById('diet').value) || 0;
+            function calculateFootprint() {
+                const electricity = parseFloat(document.getElementById('electricity').value) || 0;
+                const transport = parseFloat(document.getElementById('transport').value) || 0;
+                const diet = parseFloat(document.getElementById('diet').value) || 0;
 
-            const footprint = (electricity * 0.233) + (transport * 0.12) + (diet * 0.02);
-            
-            const resultElement = document.getElementById('result');
-            resultElement.innerHTML = `
-                <h4 class="gradient-text mb-3">Your Carbon Footprint</h4>
-                <p class="display-4 text-center">${footprint.toFixed(2)} <small>kg CO2 per day</small></p>
-            `;
-            resultElement.classList.add('show');
+                const footprint = (electricity * 0.233) + (transport * 0.12) + (diet * 0.02);
 
-            const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
-            user.footprints.push({ date: new Date().toLocaleDateString(), footprint });
-            localStorage.setItem('user', JSON.stringify(user));
+                const resultElement = document.getElementById('result');
+                resultElement.innerHTML = `
+                    <h4 class="gradient-text mb-3">Your Carbon Footprint</h4>
+                    <p class="display-4 text-center">${footprint.toFixed(2)} <small>kg CO2 per day</small></p>
+                `;
+                resultElement.classList.add('show');
 
-            const suggestionsElement = document.getElementById('suggestions');
-            suggestionsElement.innerHTML = `
-                <h5 class="gradient-text mb-3">Suggestions to Reduce Your Footprint</h5>
-                <ul class="list-group">
-                    <li class="list-group-item"><i class="fas fa-lightbulb me-2"></i>Use energy-efficient LED bulbs and appliances.</li>
-                    <li class="list-group-item"><i class="fas fa-bicycle me-2"></i>Consider cycling or using public transport for short trips.</li>
-                    <li class="list-group-item"><i class="fas fa-leaf me-2"></i>Incorporate more plant-based meals into your diet.</li>
-                </ul>
-            `;
-            suggestionsElement.classList.add('show');
+                const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
+                user.footprints.push({ date: new Date().toLocaleDateString(), footprint });
+                localStorage.setItem('user', JSON.stringify(user));
 
-            document.getElementById('successMessage').textContent = 'Your footprint has been calculated and recorded successfully!';
-            new bootstrap.Modal(document.getElementById('successModal')).show();
-        }
+                const suggestionsElement = document.getElementById('suggestions');
+                suggestionsElement.innerHTML =`
+                    <h5 class="gradient-text mb-3">Suggestions to Reduce Your Footprint</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><i class="fas fa-lightbulb me-2"></i>Use energy-efficient LED bulbs and appliances.</li>
+                        <li class="list-group-item"><i class="fas fa-bicycle me-2"></i>Consider cycling or using public transport for short trips.</li>
+                        <li class="list-group-item"><i class="fas fa-leaf me-2"></i>Incorporate more plant-based meals into your diet.</li>
+                    </ul>
+                `;
+                suggestionsElement.classList.add('show');
 
-        function setGoals() {
-            const goalElectricity = parseFloat(document.getElementById('goalElectricity').value) || 0;
-            const goalTransport = parseFloat(document.getElementById('goalTransport').value) || 0;
-            const goalDiet = parseFloat(document.getElementById('goalDiet').value) || 0;
+                document.getElementById('successMessage').textContent = 'Your footprint has been calculated and recorded successfully!';
+                new bootstrap.Modal(document.getElementById('successModal')).show();
+            }
 
-            const goals = { electricity: goalElectricity, transport: goalTransport, diet: goalDiet };
+            function setGoals() {
+                const goalElectricity = parseFloat(document.getElementById('goalElectricity').value) || 0;
+                const goalTransport = parseFloat(document.getElementById('goalTransport').value) || 0;
+                const goalDiet = parseFloat(document.getElementById('goalDiet').value) || 0;
 
-            const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
-            user.goals = goals;
-            localStorage.setItem('user', JSON.stringify(user));
+                const goals = { electricity: goalElectricity, transport: goalTransport, diet: goalDiet };
 
-            document.getElementById('successMessage').textContent = 'Your goals have been set successfully!';
-            new bootstrap.Modal(document.getElementById('successModal')).show();
+                const user = JSON.parse(localStorage.getItem('user')) || { footprints: [], goals: {} };
+                user.goals = goals;
+                localStorage.setItem('user', JSON.stringify(user));
 
-            loadUserData();
-        }
+                document.getElementById('successMessage').textContent = 'Your goals have been set successfully!';
+                new bootstrap.Modal(document.getElementById('successModal')).show();
 
-        // Voice User Interface
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
-            recognition.continuous = false;
-            recognition.lang = 'en-US';
+                loadUserData();
+            }
 
-            document.getElementById('footprintForm').addEventListener('click', function(event) {
-                if (event.target.tagName === 'INPUT') {
-                    recognition.start();
-                    recognition.onresult = function(event) {
-                        event.target.value = event.results[0][0].transcript;
-                    };
+            // 3D Graphics
+            function init3DGraphics() {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true });
+              renderer.setSize(200, 200);
+                document.getElementById('result').appendChild(renderer.domElement);
+
+                const geometry = new THREE.SphereGeometry(1, 32, 32);
+                const material = new THREE.MeshBasicMaterial({ color: 0x2ecc71, wireframe: true });
+                const sphere = new THREE.Mesh(geometry, material);
+                scene.add(sphere);
+
+                camera.position.z = 5;
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    sphere.rotation.x += 0.01;
+                    sphere.rotation.y += 0.01;
+                    renderer.render(scene, camera);
                 }
-            });
-        }
-
-        // 3D Graphics
-        function init3DGraphics() {
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(200, 200);
-            document.getElementById('result').appendChild(renderer.domElement);
-
-            const geometry = new THREE.SphereGeometry(1, 32, 32);
-            const material = new THREE.MeshBasicMaterial({ color: 0x2ecc71, wireframe: true });
-            const sphere = new THREE.Mesh(geometry, material);
-            scene.add(sphere);
-
-            camera.position.z = 5;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                sphere.rotation.x += 0.01;
-                sphere.rotation.y += 0.01;
-                renderer.render(scene, camera);
+                animate();
             }
-            animate();
-        }
 
-        // Micro-interactions
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.style.transform = 'scale(1.05)';
+            // Micro-interactions
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'cale(1.05)';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'cale(1)';
+                });
             });
-            input.addEventListener('blur', function() {
-                this.style.transform = 'scale(1)';
-            });
-        });
 
-        // AI-Driven Personalization
-        function getPersonalizedSuggestions(footprint) {
-            const suggestions = [
-                { threshold: 5, text: "Great job! Your footprint is low. Keep up the good work!" },
-                { threshold: 10, text: "You're doing well, but there's room for improvement. Try reducing your electricity usage." },
-                { threshold: 15, text: "Your footprint is above average. Consider using public transport more often." },
-                { threshold: Infinity, text: "Your footprint is high. Let's work on reducing it in all areas." }
-            ];
+            // AI-Driven Personalization
+            function getPersonalizedSuggestions(footprint) {
+                const suggestions = [
+                    { threshold: 5, text: "Great job! Your footprint is low. Keep up the good work!" },
+                    { threshold: 10, text: "You're doing well, but there's room for improvement. Try reducing your electricity usage." },
+                    { threshold: 15, text: "Your footprintis above average. Consider using public transport more often." },
+                    { threshold: Infinity, text: "Your footprint is high. Let's work on reducing it in all areas." }
+                ];
 
-            return suggestions.find(s => footprint <= s.threshold).text;
-        }
-
-        // Initialize
-        showCalculator();
-        init3DGraphics();
-
-        // Dimensional Scrolling
-        let lastScrollTop = 0;
-        window.addEventListener("scroll", function() {
-            let st = window.pageYOffset || document.documentElement.scrollTop;
-            if (st > lastScrollTop) {
-                // Scrolling down
-                document.body.style.backgroundColor = `hsl(${200 + st/10}, 20%, 95%)`;
-            } else {
-                // Scrolling up
-                document.body.style.backgroundColor = `hsl(${200 - st/10}, 20%, 95%)`;
+                return suggestions.find(s => footprint <= s.threshold).text;
             }
-            lastScrollTop = st <= 0 ? 0 : st;
-        }, false);
 
-        // Experimental Typography
-        const gradientText = document.querySelector('.gradient-text');
-        gradientText.style.backgroundImage = `linear-gradient(45deg, 
-            hsl(${Math.random() * 360}, 100%, 50%), 
-            hsl(${Math.random() * 360}, 100%, 50%))`;
-    </script>
+            // Initialize
+            showCalculator();
+            init3DGraphics();
+
+            // Dimensional Scrolling
+            let lastScrollTop = 0;
+            window.addEventListener("scroll", function() {
+                let st = window.pageYOffset || document.documentElement.scrollTop;
+                if (st > lastScrollTop) {
+                    // Scrolling down
+                    document.body.style.backgroundColor = `hsl(${200 + st/10}, 20%, 95%)`;
+                } else {
+                    // Scrolling up
+                    document.body.style.backgroundColor = `hsl(${200 - st/10}, 20%, 95%)`;
+                }
+                lastScrollTop = st <= 0? 0 : st;
+            }, false);
+
+            // Experimental Typography
+            const gradientText = document.querySelector('.gradient-text');
+            gradientText.style.backgroundImage = `linear-gradient(45deg, 
+               hsl(${Math.random() * 360}, 100%, 50%), 
+                hsl(${Math.random() * 360}, 100%, 50%))`;
+                
+        </script>
+    </div>
 </body>
 </html>
